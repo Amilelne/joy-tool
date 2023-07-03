@@ -36,5 +36,5 @@ jobs:
             ARGS: '-rltgoDzvO --delete'
             SOURCE: dist # 这是要复制到静态服务器的文件夹名称
             REMOTE_HOST: '43.156.8.30' # 你的腾讯云公网地址
-            REMOTE_USER: lighthouse # 腾讯云登录后默认为 lighthouse 用户，并且所在文件夹为 home
+            REMOTE_USER: root # 腾讯云登录后默认为 root 用户，并且所在文件夹为 home
             TARGET: /home/lighthouse/node-server # 打包后的 dist 文件夹将放在/home/lighthouse/node-server
