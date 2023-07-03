@@ -26,6 +26,6 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@3.5.9 # 使用别人写好的 actions
         with:  # 自定义环境变量
           BRANCH: gh-pages
-          FOLDER: out
+          FOLDER: dist
           clean: true
 
