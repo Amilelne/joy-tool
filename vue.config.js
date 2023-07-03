@@ -1,9 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
-  devServer: {
-    proxy: 'http://localhost:4000',
-    open: true,
-    hot: true
-  }
+  publicPath: process.env.NODE_ENV === "production" ? "/joy-tool/" : "/",
 })
