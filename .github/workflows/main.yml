@@ -25,7 +25,16 @@ jobs:
       - name: Deploy # 将打包内容发布到 github page
         uses: JamesIves/github-pages-deploy-action@v4 # 使用别人写好的 actions
         with:  # 自定义环境变量
-          BRANCH: gh-pages
-          FOLDER: dist
+          BRANCH: gh-pages # github page指定分支
+          FOLDER: dist # build后生成的目录
           clean: true
-
+      
+      - name: Deply to Tencent Cloud
+        uses: easingthemes/ssh-deploy@v2.1.5
+        env:
+            SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+            ARGS: '-rltgoDzvO --delete'
+            SOURCE: dist # 这是要复制到静态服务器的文件夹名称
+            REMOTE_HOST: '43.156.8.30' # 你的腾讯云公网地址
+            REMOTE_USER: lighthouse # 腾讯云登录后默认为 lighthouse 用户，并且所在文件夹为 home
+            TARGET: /home/lighthouse/node-server # 打包后的 dist 文件夹将放在/home/lighthouse/node-server
