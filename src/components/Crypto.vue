@@ -1,27 +1,118 @@
 <template>
-  <div>
-    <select name="cyptoAlgorithm" id="cyptoAlgorithm">
-      <option value="base64">base64</option>
-    </select>
-    <div>
-      <input v-model="inputValue" type="text" />
+  <div class="wrapper">
+    <header>
+      <h1>加解密算法</h1>
+    </header>
+    <div class="main">
+      <div class="options">
+        <span>选择算法:</span>
+        <select name="cyptoAlgorithm" id="cyptoAlgorithm" v-model="algorithm">
+          <option value="base64">base64</option>
+          <option value="md5">md5</option>
+        </select>
+      </div>
+      <div class="fpanel">
+        <div>
+          <textarea
+            v-model="inputValue"
+            name="encode"
+            id="encode"
+            cols="30"
+            rows="10"
+          ></textarea>
+        </div>
+        <div class="middle">
+          <button class="btn btn-transfer" @click="encodeInput">
+            加密
+          </button>
+          <button class="btn btn_default btn-transfer" @click="decodeInput">
+            解密
+          </button>
+        </div>
+        <div>
+          <textarea
+            v-model="cryptoValue"
+            name="decode"
+            id="decode"
+            cols="30"
+            rows="10"
+          ></textarea>
+        </div>
+      </div>
     </div>
-    <div v-if="cryptoValue">{{ cryptoValue }}</div>
   </div>
 </template>
 
-<script setup></script>
-
 <script>
+import CryptoJS from 'crypto-js';
 export default {
   name: 'CryptoValue',
   data() {
     return {
       inputValue: '',
       cryptoValue: '',
+      algorithm: 'base64',
     };
+  },
+  watch: {},
+  methods: {
+    encodeInput() {
+      if (!this.inputValue) {
+        this.$message({
+          msg: '需要加密的内容为空',
+          type: 'error',
+        });
+      }
+      if (this.algorithm === 'base64') {
+        this.cryptoValue = btoa(this.inputValue);
+      } else if (this.algorithm === 'md5') {
+        this.cryptoValue = CryptoJS.MD5(this.inputValue);
+      }
+    },
+    decodeInput() {
+      if (!this.cryptoValue) {
+        this.$message({
+          msg: '需要解密的内容为空',
+          type: 'error',
+        });
+      }
+      if (this.algorithm === 'base64') {
+        this.inputValue = atob(this.cryptoValue);
+      } else if (this.algorithm === 'md5') {
+        this.inputValue = CryptoJS.MD5(this.cryptoValue);
+      }
+    },
+    onTransfer() {
+      if (this.inputValue) {
+        this.encodeInput();
+      } else {
+        this.decodeInput();
+      }
+    },
   },
 };
 </script>
 
-<style scope></style>
+<style scope>
+.main {
+  margin-top: 48px;
+}
+select {
+  width: 120px;
+  font-size: 14px;
+  margin-left: 8px;
+  padding: 8px 16px;
+}
+.fpanel {
+  display: flex;
+  gap: 24px;
+  margin-top: 36px;
+}
+.middle {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+}
+</style>

@@ -25,13 +25,13 @@ jobs:
       - name: Deploy # 将打包内容发布到 github page
         uses: JamesIves/github-pages-deploy-action@v4 # 使用别人写好的 actions
         with:  # 自定义环境变量
-          BRANCH: gh-pages # github page指定分支
-          FOLDER: dist # build后生成的目录
+          branch: gh-pages # github page指定分支
+          folder: dist # build后生成的目录
           clean: true
       
       - name: Deply to Tencent Cloud
         uses: easingthemes/ssh-deploy@v2.1.5
-        env:
+        with:
             SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
             ARGS: '-rltgoDzvO --delete'
             SOURCE: dist # 这是要复制到静态服务器的文件夹名称

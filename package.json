@@ -10,7 +10,9 @@
   "dependencies": {
     "clipboard": "^2.0.11",
     "core-js": "^3.8.3",
+    "crypto-js": "^4.1.1",
     "proto-parser": "^0.0.9",
+    "typed.js": "^2.0.132",
     "vue": "^3.2.13",
     "vue-qr": "^4.0.9"
   },

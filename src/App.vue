@@ -1,10 +1,15 @@
 <template>
   <nav>
     <a
+      href="#/"
+      :class="['navLink', currentPath === '/' || currentPath === '#/' ? 'navLink_active' : '']"
+      >首页</a
+    >
+    <a
       href="#/proto"
       :class="[
         'navLink',
-        currentPath === '#/proto' || currentPath === '/'
+        currentPath === '#/proto'
           ? 'navLink_active'
           : '',
       ]"
@@ -36,9 +41,10 @@ import Proto from './components/Proto.vue';
 import Qrcode from './components/Qrcode/Qrcode.vue';
 import UrlEncoder from './components/UrlEncoder.vue';
 import Crypto from './components/Crypto.vue';
+import Main from './components/Main.vue';
 
 const routes = {
-  '/': Proto,
+  '/': Main,
   '/proto': Proto,
   '/qrcode': Qrcode,
   '/svg': UrlEncoder,

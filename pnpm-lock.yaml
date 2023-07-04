@@ -7,9 +7,15 @@ dependencies:
   core-js:
     specifier: ^3.8.3
     version: 3.8.3
+  crypto-js:
+    specifier: ^4.1.1
+    version: 4.1.1
   proto-parser:
     specifier: ^0.0.9
     version: 0.0.9
+  typed.js:
+    specifier: ^2.0.132
+    version: 2.0.132
   vue:
     specifier: ^3.2.13
     version: 3.2.13
@@ -3200,6 +3206,10 @@ packages:
       shebang-command: 2.0.0
       which: 2.0.2
     dev: true
+
+  /crypto-js@4.1.1:
+    resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==}
+    dev: false
 
   /css-declaration-sorter@6.4.0(postcss@8.4.24):
     resolution: {integrity: sha512-jDfsatwWMWN0MODAFuHszfjphEXfNw9JUAhmY4pLu3TyTU+ohUpsbVtbU+1MZn4a47D9kqh03i4eyOm+74+zew==}
@@ -6558,6 +6568,10 @@ packages:
       mime-types: 2.1.35
     dev: true
 
+  /typed.js@2.0.132:
+    resolution: {integrity: sha512-6lWs7dqLtfvZZtNLUJte5RYkT0rj2ACOwkeWghxSnyChSu/ZHX2NlT1KHc2daqVx3073wLIJYlCL2aHcjWYCAQ==}
+    dev: false
+
   /unicode-canonical-property-names-ecmascript@2.0.0:
     resolution: {integrity: sha512-yY5PpDlfVIU5+y/BSCxAJRBIS1Zc2dDG3Ujq+sR0U+JjUevW2JhocOF+soROYDSaAezOzOKuyyixhD6mBknSmQ==}
     engines: {node: '>=4'}
@@ -7110,3 +7124,9 @@ packages:
       normalize-path: 1.0.0
       strip-indent: 2.0.0
     dev: true
+
+  github.com/mattboldt/typed.js/cd02e533c772e35ad60ee48656b33e610eadaca7:
+    resolution: {tarball: https://codeload.github.com/mattboldt/typed.js/tar.gz/cd02e533c772e35ad60ee48656b33e610eadaca7}
+    name: typed.js
+    version: 2.0.16
+    dev: false
