@@ -11,9 +11,9 @@
           placeholder="proto: 上传文件或手动输入"
         ></textarea>
       </div>
-      <div>
+      <div class="mainInput">
         <input
-          class="inputField mainInput"
+          class="inputField"
           id="main"
           type="text"
           v-model="mainField"
@@ -22,15 +22,12 @@
       </div>
       <div class="transformType">
         <label for="transformType" class="transformTypeLabel">转换类型:</label>
-        <select
-          name="transformType"
-          id="transformType"
-          class="transformTypeSelect"
+        <my-select
           v-model="selectType"
-        >
-          <option value="0">Typescript</option>
-          <option value="1">QQMail</option>
-        </select>
+          :menu="menu"
+          :custom-style="{width: '200px'}"
+          class="transformTypeSelect"
+        ></my-select>
       </div>
       <div class="submitBtn">
         <button @click="onSubmit" class="btn">提交</button>
@@ -65,7 +62,10 @@
 <script>
 import ClipboardJS from 'clipboard';
 import protoTransform from '../utils/proto/index';
-
+const typeValue = {
+  'Typescript': 0,
+  'QQMail': 1
+}
 export default {
   name: 'ProtoType',
   data() {
@@ -73,10 +73,20 @@ export default {
       protos: '',
       mainField: '',
       transformed: '',
-      selectType: 0,
+      selectType: 'Typescript',
       validateRules: {
         required: ['mainField', 'protos'],
       },
+      menu: [
+        {
+          name: 'Typescript',
+          value: 'Typescript',
+        },
+        {
+          name: 'QQMail',
+          value: 'QQMail',
+        },
+      ],
     };
   },
   mounted() {
@@ -105,13 +115,13 @@ export default {
       const { error, main, code } = protoTransform({
         proto: this.protos,
         main: this.mainField,
-        type: Number(this.selectType),
+        type: Number(typeValue[this.selectType]),
       });
       if (error) {
         this.$message({
           msg: error,
           type: 'error',
-          duration: 5000
+          duration: 5000,
         });
         console.error(error);
       } else {
@@ -161,12 +171,14 @@ export default {
 }
 .form {
   width: 500px;
+  padding: 0px 16px;
 }
 .label {
   text-align: left;
   font-size: 16px;
 }
 .mainInput {
+  display: flex;
   margin-bottom: 32px;
   height: 24px;
 }
@@ -175,7 +187,7 @@ export default {
   gap: 10px;
 }
 .inputField {
-  width: 450px;
+  width: 100%;
   border: 1px solid black;
   border-radius: 8px;
   padding: 16px;
@@ -189,7 +201,6 @@ export default {
   margin-top: 32px;
 }
 .displayField {
-  width: 450px;
   border: 1px dashed gray;
   border-radius: 8px;
   padding: 16px;
@@ -233,25 +244,18 @@ export default {
 .transformType {
   margin-bottom: 32px;
   text-align: left;
-  padding-left: 24px;
+  display: flex;
+  align-items: center;
+
 }
 .transformTypeLabel {
   margin-right: 8px;
   font-size: 16px;
 }
-.transformTypeSelect {
-  padding: 8px 16px;
-}
 
 @media screen and (max-width: 500px) {
   .form {
     width: 400px;
-  }
-  .inputField {
-    width: 300px;
-  }
-  .displayField {
-    width: 300px;
   }
 }
 </style>

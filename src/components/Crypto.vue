@@ -5,8 +5,12 @@
     </header>
     <div class="main">
       <div class="options">
-        <span>选择算法:</span>
-        <MySelect :menu="menu" :custom-style="{width: '200px', height: '32px'}" />
+        <span class="algo_label">选择算法: </span>
+        <my-select
+          v-model="algorithm"
+          :menu="menu"
+          :custom-style="{ width: '200px' }"
+        ></my-select>
         <!-- <select name="cyptoAlgorithm" id="cyptoAlgorithm" v-model="algorithm">
           <option value="base64">base64</option>
           <option value="md5">md5</option>
@@ -44,7 +48,6 @@
 
 <script>
 import CryptoJS from 'crypto-js';
-import MySelect from './MySelect.vue';
 
 const menu = [
   {
@@ -102,7 +105,6 @@ export default {
       }
     },
   },
-  components: { MySelect },
 };
 </script>
 
@@ -113,6 +115,11 @@ export default {
 .options {
   display: flex;
   justify-content: center;
+  align-items: center;
+  font-size: 18px;
+}
+.algo_label {
+  margin-right: 12px;
 }
 .fpanel {
   display: flex;
