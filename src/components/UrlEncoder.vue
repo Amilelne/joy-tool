@@ -276,7 +276,7 @@ export default {
   box-sizing: border-box;
 }
 .wrapper {
-  width: 650px;
+  max-width: 650px;
   margin: 1.5rem auto 4rem;
   font-family: monospace;
 }
@@ -388,5 +388,15 @@ textarea {
 }
 .contrast_button__silver {
   background-color: silver;
+}
+
+@media screen and (max-width: 500px) {
+  .layer {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .panel {
+    margin: 52px 10px 0;
+  }
 }
 </style>

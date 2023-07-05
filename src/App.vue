@@ -156,4 +156,13 @@ input[type='file']::file-selector-button {
   cursor: pointer;
   border-radius: 5px;
 }
+@media screen and (max-width: 500px) {
+  .navLink {
+    font-size: 16px;
+  }
+  .navLink_active::after {
+    top: 30px;
+    width: 30px;
+  }
+}
 </style>

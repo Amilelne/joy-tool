@@ -148,7 +148,8 @@ export default {
   min-height: 600px;
 }
 .pasteImage {
-  height: 200px;
+  min-height: 200px;
+  min-width: 200px;
   border: 1px dashed skyblue;
   background-color: white;
   flex: 1;
@@ -202,5 +203,15 @@ export default {
 .generate_btn {
   margin-left: 32px;
   height: 50px !important;
+}
+
+@media screen and (max-width: 500px) {
+  .inputText_wrp {
+    padding: 8px;
+  }
+  .input_wrp {
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 </style>

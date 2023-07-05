@@ -6,10 +6,11 @@
     <div class="main">
       <div class="options">
         <span>选择算法:</span>
-        <select name="cyptoAlgorithm" id="cyptoAlgorithm" v-model="algorithm">
+        <MySelect :menu="menu" :custom-style="{width: '200px', height: '32px'}" />
+        <!-- <select name="cyptoAlgorithm" id="cyptoAlgorithm" v-model="algorithm">
           <option value="base64">base64</option>
           <option value="md5">md5</option>
-        </select>
+        </select> -->
       </div>
       <div class="fpanel">
         <div>
@@ -22,9 +23,7 @@
           ></textarea>
         </div>
         <div class="middle">
-          <button class="btn btn-transfer" @click="encodeInput">
-            加密
-          </button>
+          <button class="btn btn-transfer" @click="encodeInput">加密</button>
           <button class="btn btn_default btn-transfer" @click="decodeInput">
             解密
           </button>
@@ -45,6 +44,18 @@
 
 <script>
 import CryptoJS from 'crypto-js';
+import MySelect from './MySelect.vue';
+
+const menu = [
+  {
+    name: 'base64',
+    value: 'base64',
+  },
+  {
+    name: 'md5',
+    value: 'md5',
+  },
+];
 export default {
   name: 'CryptoValue',
   data() {
@@ -52,6 +63,7 @@ export default {
       inputValue: '',
       cryptoValue: '',
       algorithm: 'base64',
+      menu,
     };
   },
   watch: {},
@@ -90,6 +102,7 @@ export default {
       }
     },
   },
+  components: { MySelect },
 };
 </script>
 
@@ -97,11 +110,9 @@ export default {
 .main {
   margin-top: 48px;
 }
-select {
-  width: 120px;
-  font-size: 14px;
-  margin-left: 8px;
-  padding: 8px 16px;
+.options {
+  display: flex;
+  justify-content: center;
 }
 .fpanel {
   display: flex;
@@ -114,5 +125,16 @@ select {
   gap: 16px;
   align-items: center;
   justify-content: center;
+}
+
+@media screen and (max-width: 500px) {
+  .fpanel {
+    flex-direction: column;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  .main {
+    margin-top: 24px;
+  }
 }
 </style>

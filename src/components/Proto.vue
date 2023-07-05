@@ -242,4 +242,16 @@ export default {
 .transformTypeSelect {
   padding: 8px 16px;
 }
+
+@media screen and (max-width: 500px) {
+  .form {
+    width: 400px;
+  }
+  .inputField {
+    width: 300px;
+  }
+  .displayField {
+    width: 300px;
+  }
+}
 </style>
