@@ -60,7 +60,7 @@ onMounted((_) => initEditor());
 </script>
 
 <script>
-import {parser} from './parser/parser';
+import { parser } from './parser/parser';
 import juice from 'juice';
 import basicStyle from './template/basicStyle';
 
@@ -71,9 +71,23 @@ export default {
       content: '',
     };
   },
+  mounted() {
+    const that = this;
+    document.addEventListener('keydown', (e) => {
+      if (e.metaKey && e.key === 's') {
+        e.stopPropagation();
+        e.preventDefault();
+        that.onSave();
+      }else if(e.metaKey && e.key === 'm'){
+        e.stopPropagation();
+        e.preventDefault();
+        that.onCopyMp();
+      }
+    });
+  },
   methods: {
     onSave() {
-      this.state.editor
+      return this.state.editor
         .save()
         .then((outputData) => {
           this.content = outputData;
@@ -86,20 +100,24 @@ export default {
     onClickH1() {
       console.log('click h1');
     },
-    onCopyMp() {
+    async onCopyMp() {
+      await this.onSave();
       this.$message({
         msg: '复制成功，请粘贴到微信公众号平台',
         type: 'success',
       });
-      const parsedArr = parser().parse(this.content);
-      const htmlText = `<section id="nice">${parsedArr.join('')}</section>`
-      console.log('res', htmlText);
+      const parsedArr = parser().parse(this.content) || [];
+      const htmlText = `<section id="nice">${parsedArr.join('')}</section>`;
       const styledHtml = juice.inlineContent(htmlText, basicStyle, {
         inlinePseudoElements: true,
-        preserveImportant: true
-      })
-      console.log("styled", styledHtml);
-      navigator.clipboard.write([new ClipboardItem({'text/html': new Blob([styledHtml], {type: 'text/html'})})]);
+        preserveImportant: true,
+      });
+      console.log('styled', styledHtml);
+      navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': new Blob([styledHtml], { type: 'text/html' }),
+        }),
+      ]);
     },
   },
 };
@@ -113,10 +131,12 @@ export default {
   background-color: rgba(0, 0, 0, 0.02);
 }
 .editor_instance {
+  max-width: 800px;
   height: 600px;
   overflow: scroll;
   background-color: white;
   box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.08);
+  margin: auto;
 }
 .editor_actions {
   margin-top: 12px;
@@ -125,8 +145,15 @@ export default {
 }
 .right_panel {
   position: absolute;
+  right: 60px;
   top: 30px;
-  right: 10px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  width: 40px;
+  background: white;
+  height: 100px;
+  box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.08);
 }
 .panel_icon {
   width: 24px;
