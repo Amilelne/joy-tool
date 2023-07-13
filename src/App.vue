@@ -30,6 +30,11 @@
       :class="['navLink', currentPath === '#/crypto' ? 'navLink_active' : '']"
       >Crypto</a
     >
+    <a
+      href="#/editor"
+      :class="['navLink', currentPath === '#/editor' ? 'navLink_active' : '']"
+      >Editor</a
+    >
   </nav>
   <div class="content">
     <component :is="currentView" />
@@ -42,13 +47,15 @@ import Qrcode from './components/Qrcode/Qrcode.vue';
 import UrlEncoder from './components/UrlEncoder.vue';
 import Crypto from './components/Crypto.vue';
 import Main from './components/Main.vue';
+import MyEditor from './components/MyEditor/MyEditor.vue';
 
 const routes = {
   '/': Main,
   '/proto': Proto,
   '/qrcode': Qrcode,
   '/svg': UrlEncoder,
-  '/crypto': Crypto
+  '/crypto': Crypto,
+  '/editor': MyEditor
 };
 
 export default {

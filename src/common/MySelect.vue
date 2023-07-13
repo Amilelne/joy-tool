@@ -9,7 +9,10 @@
         <span v-if="modelValue">{{ modelValue }}</span>
         <span v-else class="placeholder">{{ placeholder }}</span>
       </div>
-      <img class="select_arrow" src="../assets/downArrow.svg" alt="" />
+      <div>
+        <img v-if="modelValue" class="select_arrow" src="../assets/downArrow.svg" alt="" />
+        <!-- <img v-if="modelValue &&" class="select_arrow" src="../assets/downArrow.svg" alt="" /> -->
+      </div>
     </div>
     <div class="options_panel" v-show="menuShow" :style="optionsPanelStyle">
       <div
@@ -80,7 +83,7 @@ const onClickOutside = () => {
 <style scope>
 .menu_wrapper {
   display: block;
-  font-size: 18px;
+  font-size: 16px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   font-family: monospace;
