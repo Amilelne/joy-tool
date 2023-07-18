@@ -62,7 +62,7 @@ onMounted((_) => initEditor());
 <script>
 import { parser } from './parser/parser';
 import juice from 'juice';
-import basicStyle from './template/basicStyle';
+import basicStyle from '../../template/basicStyle';
 
 export default {
   name: 'MyEditor',

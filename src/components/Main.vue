@@ -1,42 +1,109 @@
 <template>
-  <div class="mainWrp">
-    <div ref="typing" class="typing"></div>
-    <div class="avatar">
-        <img class="avatar_img" src="../assets/avatar.png" alt="avatar">
+  <div class="markdown-editor">
+    <codemirror
+      v-model="code"
+      placeholder="请输入"
+      :style="{ height: '100vh', width: '50%' }"
+      :autofocus="true"
+      :indent-with-tab="true"
+      :extensions="extensions"
+      @change="debounceEditorChange"
+    />
+    <div class="rendered">
+      <div class="rendered_html" v-html="parseHtml"></div>
+      <div class="actions">
+        <div>
+          <img
+            class="action_icon"
+            src="../assets/mp.svg"
+            alt="mp"
+            @click="onCopyMp"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue';
-import Typed from 'typed.js';
-
-const typing = ref(null);
-
-onMounted(() => {
-  new Typed(typing.value, {
-    strings: [
-      '<span class="neon">欢迎来到这个神奇的网站!</span>',
-      '<span class="neon">猪猪同学，把鼠标放到头像上</span>',
-      '<span class="neon">好玩吗?</span>',
-    ],
-    typeSpeed: 100,
-    backSpeed: 60,
-    loop: true,
-  });
-});
-</script>
-
 <script>
+import { ref } from 'vue';
+import { Codemirror } from 'vue-codemirror';
+import { markdown } from '@codemirror/lang-markdown';
+import { markdownParser } from '../utils/markdowm/parse';
+import { debounce } from 'lodash';
+import juice from 'juice';
+import basicStyle from '../template/basicStyle';
+
 export default {
   name: 'MainPage',
+  components: { Codemirror },
+  setup() {
+    const code = ref('');
+    const extensions = [markdown()];
+    return {
+      code,
+      extensions,
+    };
+  },
+  created() {
+    this.debounceEditorChange = debounce(this.onEditorChange, 1000);
+  },
   data() {
-    return {};
+    return {
+      parseHtml: '',
+    };
+  },
+  methods: {
+    onEditorChange(val) {
+      this.parseHtml = markdownParser.render(val);
+    },
+    onCopyMp() {
+      this.$message({
+        msg: '复制成功，请粘贴到微信公众号平台',
+        type: 'success',
+      });
+      const htmlText = `<section id="nice">${this.parseHtml}</section>`;
+      const styledHtml = juice.inlineContent(htmlText, basicStyle, {
+        inlinePseudoElements: true,
+        preserveImportant: true,
+      });
+      navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': new Blob([styledHtml], { type: 'text/html' }),
+        }),
+      ]);
+    },
   },
 };
 </script>
 
 <style scope>
+.markdown-editor {
+  display: flex;
+}
+.rendered {
+  background: rgba(0, 0, 0, 0.02);
+  height: 100vh;
+  width: 50%;
+  padding: 20px;
+  display: flex;
+}
+.rendered_html {
+  background-color: white;
+  overflow-y: auto;
+  padding: 25px 20px;
+  height: 100%;
+  width: 90%;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
+}
+.actions {
+  margin-left: 16px;
+  justify-content: center;
+  display: flex;
+}
+.action_icon {
+  width: 24px;
+}
 .mainWrp {
   display: flex;
   justify-content: center;
@@ -67,22 +134,22 @@ export default {
   }
 }
 .avatar {
-    position: absolute;
-    top: 400px;
+  position: absolute;
+  top: 400px;
 }
 .avatar_img {
-    width: 200px;
-    height: 200px;
+  width: 200px;
+  height: 200px;
 }
 .avatar_img:hover {
-    animation: spining 1s alternate infinite;
+  animation: spining 1s alternate infinite;
 }
 @keyframes spining {
-    from {
-        transform: rotate(0deg)  scale(0.8);
-    }
-    to{
-        transform: rotate(360deg) scale(1.2);
-    }
+  from {
+    transform: rotate(0deg) scale(0.8);
+  }
+  to {
+    transform: rotate(360deg) scale(1.2);
+  }
 }
 </style>
