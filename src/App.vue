@@ -120,6 +120,9 @@ nav {
 .navLink:hover {
   color: #1677ff;
 }
+.content {
+  text-align: center;
+}
 .btn {
   font-size: 18px;
   color: #fff;
