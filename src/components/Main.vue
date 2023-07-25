@@ -80,6 +80,7 @@ export default {
 <style scope>
 .markdown-editor {
   display: flex;
+  text-align: left;
 }
 .rendered {
   background: rgba(0, 0, 0, 0.02);
