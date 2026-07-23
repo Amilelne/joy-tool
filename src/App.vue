@@ -35,6 +35,11 @@
       :class="['navLink', currentPath === '#/editor' ? 'navLink_active' : '']"
       >Editor</a
     >
+    <a
+      href="#/bazi"
+      :class="['navLink', currentPath === '#/bazi' ? 'navLink_active' : '']"
+      >八字</a
+    >
   </nav>
   <div class="content">
     <component :is="currentView" />
@@ -48,6 +53,7 @@ import UrlEncoder from './components/UrlEncoder.vue';
 import Crypto from './components/Crypto.vue';
 import Main from './components/Main.vue';
 import MyEditor from './components/MyEditor/MyEditor.vue';
+import Bazi from './components/Bazi/Bazi.vue';
 
 const routes = {
   '/': Main,
@@ -55,7 +61,8 @@ const routes = {
   '/qrcode': Qrcode,
   '/svg': UrlEncoder,
   '/crypto': Crypto,
-  '/editor': MyEditor
+  '/editor': MyEditor,
+  '/bazi': Bazi
 };
 
 export default {
@@ -85,12 +92,14 @@ export default {
 <style>
 body {
   margin: 0;
+  background: #ffffff;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  min-height: 100vh;
 }
 nav {
   display: flex;
@@ -172,6 +181,29 @@ input[type='file']::file-selector-button {
   .navLink_active::after {
     top: 30px;
     width: 30px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #17171f;
+  }
+  #app {
+    color: #e2e2ea;
+  }
+  nav {
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.4);
+  }
+  .navLink {
+    color: #e2e2ea;
+  }
+  .navLink:hover {
+    color: #4d9fff;
+  }
+  .btn_default {
+    background-color: #2a2a38;
+    border-color: #3a3a48;
+    color: #e2e2ea;
   }
 }
 </style>
