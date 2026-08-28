@@ -40,6 +40,11 @@
       :class="['navLink', currentPath === '#/bazi' ? 'navLink_active' : '']"
       >八字</a
     >
+    <a
+      href="#/long-text-pics"
+      :class="['navLink', currentPath === '#/long-text-pics' ? 'navLink_active' : '']"
+      >长文转图</a
+    >
   </nav>
   <div class="content">
     <component :is="currentView" />
@@ -54,6 +59,7 @@ import Crypto from './components/Crypto.vue';
 import Main from './components/Main.vue';
 import MyEditor from './components/MyEditor/MyEditor.vue';
 import Bazi from './components/Bazi/Bazi.vue';
+import LongTextPics from './components/LongTextPics/LongTextPics.vue';
 
 const routes = {
   '/': Main,
@@ -62,7 +68,8 @@ const routes = {
   '/svg': UrlEncoder,
   '/crypto': Crypto,
   '/editor': MyEditor,
-  '/bazi': Bazi
+  '/bazi': Bazi,
+  '/long-text-pics': LongTextPics
 };
 
 export default {
