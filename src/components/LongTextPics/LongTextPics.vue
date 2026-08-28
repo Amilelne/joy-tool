@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch, nextTick, getCurrentInstance } from 'vue'
 import { templates, getTemplate } from './templates.js'
 import { paginate, renderPage, TITLE_STYLES } from './renderer.js'
 
@@ -133,12 +133,214 @@ function downloadOne(i) {
   link.click()
 }
 
-async function downloadAll() {
-  for (let i = 0; i < pages.value.length; i++) {
-    downloadOne(i)
-    // 稍作延迟，避免浏览器拦截连续下载
-    await new Promise(r => setTimeout(r, 300))
+const instance = getCurrentInstance()
+const $message = (instance && instance.proxy && instance.proxy.$message) || ((opts) => alert(opts.msg))
+
+// 同步获取 PNG dataURL（toDataURL 在 webview 中稳定可用，toBlob 可能不触发回调）
+function canvasToPngDataURL(canvas) {
+  return canvas.toDataURL('image/png')
+}
+
+// dataURL -> Uint8Array（同步，用 atob 解码 base64）
+function dataURLToBytes(dataURL) {
+  const base64 = dataURL.split(',')[1]
+  const binary = atob(base64)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+  return bytes
+}
+
+// dataURL -> Blob（供目录写入使用）
+function dataURLToBlob(dataURL) {
+  const mime = (dataURL.match(/^data:(.*?);/) || [])[1] || 'image/png'
+  return new Blob([dataURLToBytes(dataURL)], { type: mime })
+}
+
+// Uint8Array -> base64 字符串
+function bytesToBase64(bytes) {
+  let binary = ''
+  const chunk = 0x8000
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk))
   }
+  return btoa(binary)
+}
+
+// 用 data URL 触发下载（blob URL 在部分内嵌浏览器/webview 里会被静默拦截）
+function downloadBytes(bytes, filename, mime) {
+  const link = document.createElement('a')
+  link.href = `data:${mime};base64,${bytesToBase64(bytes)}`
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+/* ==================== 零依赖 ZIP 打包（STORE 模式） ==================== */
+
+const CRC_TABLE = (() => {
+  const table = new Uint32Array(256)
+  for (let n = 0; n < 256; n++) {
+    let c = n
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1
+    table[n] = c >>> 0
+  }
+  return table
+})()
+
+function crc32(bytes) {
+  let crc = 0xffffffff
+  for (let i = 0; i < bytes.length; i++) {
+    crc = CRC_TABLE[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8)
+  }
+  return (crc ^ 0xffffffff) >>> 0
+}
+
+/**
+ * 把多个文件打包成 zip（不压缩，PNG 本身已是压缩格式）。
+ * files: [{ name, data: Uint8Array }]
+ */
+function buildZip(files) {
+  const encoder = new TextEncoder()
+  const now = new Date()
+  const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1)
+  const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()
+
+  const parts = []
+  const centralParts = []
+  let offset = 0
+
+  for (const f of files) {
+    const nameBytes = encoder.encode(f.name)
+    const data = f.data
+    const crc = crc32(data)
+
+    // Local file header
+    const local = new DataView(new ArrayBuffer(30))
+    local.setUint32(0, 0x04034b50, true)
+    local.setUint16(4, 20, true)
+    local.setUint16(6, 0x0800, true) // UTF-8 文件名
+    local.setUint16(8, 0, true) // STORE
+    local.setUint16(10, dosTime, true)
+    local.setUint16(12, dosDate, true)
+    local.setUint32(14, crc, true)
+    local.setUint32(18, data.length, true)
+    local.setUint32(22, data.length, true)
+    local.setUint16(26, nameBytes.length, true)
+    local.setUint16(28, 0, true)
+    parts.push(local.buffer, nameBytes, data)
+
+    // Central directory header
+    const cen = new DataView(new ArrayBuffer(46))
+    cen.setUint32(0, 0x02014b50, true)
+    cen.setUint16(4, 20, true)
+    cen.setUint16(6, 20, true)
+    cen.setUint16(8, 0x0800, true)
+    cen.setUint16(10, 0, true)
+    cen.setUint16(12, dosTime, true)
+    cen.setUint16(14, dosDate, true)
+    cen.setUint32(16, crc, true)
+    cen.setUint32(20, data.length, true)
+    cen.setUint32(24, data.length, true)
+    cen.setUint16(28, nameBytes.length, true)
+    cen.setUint16(30, 0, true)
+    cen.setUint16(32, 0, true)
+    cen.setUint16(34, 0, true)
+    cen.setUint16(36, 0, true)
+    cen.setUint32(38, 0, true)
+    cen.setUint32(42, offset, true)
+    centralParts.push(cen.buffer, nameBytes)
+
+    offset += 30 + nameBytes.length + data.length
+  }
+
+  const centralSize = centralParts.reduce((s, p) => s + p.byteLength, 0)
+  const end = new DataView(new ArrayBuffer(22))
+  end.setUint32(0, 0x06054b50, true)
+  end.setUint16(4, 0, true)
+  end.setUint16(6, 0, true)
+  end.setUint16(8, files.length, true)
+  end.setUint16(10, files.length, true)
+  end.setUint32(12, centralSize, true)
+  end.setUint32(16, offset, true)
+  end.setUint16(20, 0, true)
+
+  // 合并所有分片为单个 Uint8Array
+  const all = [...parts, ...centralParts, end.buffer]
+  const total = all.reduce((s, p) => s + p.byteLength, 0)
+  const out = new Uint8Array(total)
+  let pos = 0
+  for (const p of all) {
+    out.set(p instanceof ArrayBuffer ? new Uint8Array(p) : p, pos)
+    pos += p.byteLength
+  }
+  return out
+}
+
+// 把所有图片打包成一个 zip 并下载（一次下载，不依赖目录选择 API）
+function downloadAllAsZip() {
+  try {
+    const n = pages.value.length
+    const files = []
+    for (let i = 0; i < n; i++) {
+      const canvas = canvasRefs.value[i]
+      if (!canvas) continue
+      const dataURL = canvasToPngDataURL(canvas)
+      files.push({ name: `长文图片_${i + 1}.png`, data: dataURLToBytes(dataURL) })
+    }
+    if (files.length === 0) {
+      $message({ msg: '暂无可导出的图片', type: 'error' })
+      return
+    }
+    downloadBytes(buildZip(files), '长文图片.zip', 'application/zip')
+    $message({ msg: `已打包 ${files.length} 张图片并下载（长文图片.zip）`, type: 'success' })
+  } catch (e) {
+    console.error('[长文转图] zip 导出失败', e)
+    $message({ msg: '导出失败：' + (e && e.message ? e.message : e), type: 'error' })
+  }
+}
+
+// 选择目录后批量导出；浏览器不支持或写入失败时自动降级为 zip 打包下载
+async function exportAllToDirectory() {
+  const n = pages.value.length
+  if (n === 0) {
+    $message({ msg: '暂无可导出的图片', type: 'error' })
+    return
+  }
+
+  // 优先：Chrome/Edge 支持选择目录直接写入
+  if (window.showDirectoryPicker) {
+    let dirHandle
+    try {
+      dirHandle = await window.showDirectoryPicker()
+    } catch (e) {
+      if (e && e.name === 'AbortError') return // 用户取消选择目录
+      console.error('[长文转图] 选择目录失败，降级 zip', e)
+      downloadAllAsZip()
+      return
+    }
+
+    try {
+      for (let i = 0; i < n; i++) {
+        const canvas = canvasRefs.value[i]
+        if (!canvas) continue
+        const blob = dataURLToBlob(canvasToPngDataURL(canvas))
+        const fileHandle = await dirHandle.getFileHandle(`长文图片_${i + 1}.png`, { create: true })
+        const writable = await fileHandle.createWritable()
+        await writable.write(blob)
+        await writable.close()
+      }
+      $message({ msg: `已导出 ${n} 张图片到所选目录`, type: 'success' })
+    } catch (e) {
+      console.error('[长文转图] 写入目录失败，降级 zip', e)
+      $message({ msg: '目录写入失败，已改为 zip 打包下载', type: 'error' })
+      downloadAllAsZip()
+    }
+    return
+  }
+
+  // 不支持选择目录（Safari/Firefox/内嵌浏览器）：打包成 zip 一次下载
+  downloadAllAsZip()
 }
 
 // 支持 Ctrl+A / Cmd+A 全选（macOS 上 Ctrl+A 默认是光标移到行首，需手动处理）
@@ -283,7 +485,7 @@ function handleEditorKeydown(e) {
           placeholder="留空则不显示水印"
         />
 
-        <button class="btn-primary" @click="downloadAll">导出全部图片</button>
+        <button class="btn-primary" @click="exportAllToDirectory">导出全部图片（选择目录）</button>
       </section>
 
       <!-- 右侧：预览 -->
