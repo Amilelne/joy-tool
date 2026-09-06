@@ -40,12 +40,6 @@ const paragraphGap = ref(40)         // 段落间距（空行的额外高度）
 
 const canvasRefs = ref([])           // 每页对应的 canvas 元素
 
-// 暗黑模式：默认跟随系统偏好，可在顶栏切换
-const prefersDark = typeof window !== 'undefined'
-  && window.matchMedia
-  && window.matchMedia('(prefers-color-scheme: dark)').matches
-const dark = ref(!!prefersDark)
-
 // 当前模板
 const template = computed(() => getTemplate(currentTemplateId.value))
 
@@ -353,15 +347,12 @@ function handleEditorKeydown(e) {
 </script>
 
 <template>
-  <div class="long-text-pics" :class="{ dark }">
+  <div class="long-text-pics">
     <header class="topbar">
       <div class="topbar-left">
         <h1>长文转图片</h1>
         <span class="subtitle">粘贴长文，自动生成小红书风分享图</span>
       </div>
-      <button class="theme-toggle" type="button" @click="dark = !dark">
-        {{ dark ? '亮色模式' : '暗色模式' }}
-      </button>
     </header>
 
     <div class="layout">
@@ -507,21 +498,8 @@ function handleEditorKeydown(e) {
 
 <style>
 .long-text-pics {
-  color-scheme: light;
-  --bg: #f7f7f8;
-  --surface: #ffffff;
-  --surface-2: #f4f4f5;
-  --border: #e5e5e5;
-  --border-strong: #eeeeee;
-  --text: #333333;
-  --text-secondary: #555555;
-  --text-muted: #999999;
-  --text-faint: #bbbbbb;
   --accent: #ff2e4d;
   --accent-strong: #e61e3c;
-  --shadow: rgba(0, 0, 0, 0.04);
-  --shadow-md: rgba(0, 0, 0, 0.06);
-  --shadow-lg: rgba(0, 0, 0, 0.1);
 
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
   background: var(--bg);
@@ -533,22 +511,10 @@ function handleEditorKeydown(e) {
   transition: background 0.25s, color 0.25s;
 }
 
-.long-text-pics.dark {
-  color-scheme: dark;
-  --bg: #141417;
-  --surface: #1f1f24;
-  --surface-2: #2a2a31;
-  --border: #3a3a43;
-  --border-strong: #333339;
-  --text: #e8e8ea;
-  --text-secondary: #c7c7cc;
-  --text-muted: #8f8f96;
-  --text-faint: #63636b;
+/* 暗色主题由全局 html.dark 控制，这里仅覆盖页面特色主色以保证对比度 */
+html.dark .long-text-pics {
   --accent: #ff5c72;
   --accent-strong: #ff3f58;
-  --shadow: rgba(0, 0, 0, 0.28);
-  --shadow-md: rgba(0, 0, 0, 0.35);
-  --shadow-lg: rgba(0, 0, 0, 0.5);
 }
 
 .long-text-pics,
@@ -580,21 +546,6 @@ function handleEditorKeydown(e) {
 .long-text-pics .subtitle {
   font-size: 13px;
   color: var(--text-muted);
-}
-.long-text-pics .theme-toggle {
-  padding: 8px 16px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-secondary);
-  border-radius: 999px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-  flex-shrink: 0;
-}
-.long-text-pics .theme-toggle:hover {
-  border-color: var(--accent);
-  color: var(--accent);
 }
 
 .long-text-pics .layout {

@@ -305,29 +305,28 @@ export default {
   color: var(--bazi-accent);
 }
 
-@media (prefers-color-scheme: dark) {
-  .bazi-wrapper {
-    --bazi-card: #23232f;
-    --bazi-card-alt: #1e1e29;
-    --bazi-head: #2c2c3b;
-    --bazi-border: #33333f;
-    --bazi-title: #e8e8f0;
-    --bazi-label: #8a8a99;
-    --bazi-text: #e2e2ea;
-    --bazi-head-text: #b8b8c6;
-    --bazi-note-bg: #23232f;
-    --bazi-accent: #e0b84c;
-    --bazi-input-bg: #2a2a38;
-    --bazi-input-border: #3a3a48;
-    --wx-wood: #4ade80;
-    --wx-fire: #ff6b6b;
-    --wx-earth: #74612c;
-    --wx-metal: #f4bd3e;
-    --wx-water: #4d9fff;
-  }
-  .bazi-table table {
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
-  }
+/* 暗色主题由全局 html.dark 控制（在导航栏切换） */
+html.dark .bazi-wrapper {
+  --bazi-card: #23232f;
+  --bazi-card-alt: #1e1e29;
+  --bazi-head: #2c2c3b;
+  --bazi-border: #33333f;
+  --bazi-title: #e8e8f0;
+  --bazi-label: #8a8a99;
+  --bazi-text: #e2e2ea;
+  --bazi-head-text: #b8b8c6;
+  --bazi-note-bg: #23232f;
+  --bazi-accent: #e0b84c;
+  --bazi-input-bg: #2a2a38;
+  --bazi-input-border: #3a3a48;
+  --wx-wood: #4ade80;
+  --wx-fire: #ff6b6b;
+  --wx-earth: #74612c;
+  --wx-metal: #f4bd3e;
+  --wx-water: #4d9fff;
+}
+html.dark .bazi-table table {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 
 @media screen and (max-width: 500px) {
